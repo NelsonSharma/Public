@@ -1,6 +1,8 @@
+Hello & Welcome to NelsonSharma/Public
+
 This is a Shared Repo for Public Access.
 
-Happy Programming!
+GG Well Played!
 
 _______________________________________
 
@@ -18,3 +20,11 @@ G-Drive 	 https://drive.google.com/drive/folders/1asgiYKn0P86TKCAr-BozZlNAliP1Il
 
 One-Dive 	 https://1drv.ms/u/s!Ajq_N1Mt7YELgmUi8pDfVahoEm51?e=AIZIcn
 
+
+_______________________________________
+
+Other Links:
+
+kaggle_code 	 https://www.kaggle.com/nelsonsharma/code
+
+kaggle_data 	 https://www.kaggle.com/nelsonsharma/datasets
