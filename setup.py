@@ -10,7 +10,7 @@ setup(
     long_description="~",
     long_description_content_type="text/markdown",
     #py_modules =    [""],
-    packages =      ['basic'],
+    packages =      ['known'],
     license =       'Apache2.0',
     package_dir =   { '' : 'src'},
     install_requires = [],
