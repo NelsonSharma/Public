@@ -30,9 +30,10 @@ def shows(*X, P = print):
     for x in X:
         show(x, P)
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def showx(x, P = print, sw='_'):
+def showx(x,  sw='__', ew='__', P = print):
+    """ Note: 'sw' can accept tuples """
     for d in dir(x):
-        if not d.startswith(sw):
+        if not (d.startswith(sw) or d.endswith(ew)):
             v = ""
             try:
                 v = getattr(x, d)
@@ -40,7 +41,16 @@ def showx(x, P = print, sw='_'):
                 v='?'
             P(d, '\t\t:', v)
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- 
+def showz(x, P = print):
+    """ same as showx but shows all members, skip startswith test """
+    for d in dir(x):
+        v = ""
+        try:
+            v = getattr(x, d)
+        except:
+            v='?'
+        P(d, '\t\t:', v)
+#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Time-stamping functions
