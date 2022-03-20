@@ -1,18 +1,16 @@
 from setuptools import setup
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
 setup(
-    name =          'qpdb',
+    name =          'known',
     version =       '0.0.1',  # 0.0.x is for unstable versions
-    url =           "https://github.com/Nelson-iitp/qpdb",
+    url =           "https://github.com/NelsonSharma/Public",
     author =        "Nelson.S",
     author_email =  "mail.nelsonsharma@gmail.com",
-    description =   'qpdb',
-    long_description=long_description,
+    description =   '~',
+    long_description="~",
     long_description_content_type="text/markdown",
     #py_modules =    [""],
-    packages =      ['qpdb'],
+    packages =      ['basic'],
     license =       'Apache2.0',
     package_dir =   { '' : 'src'},
     install_requires = [],
