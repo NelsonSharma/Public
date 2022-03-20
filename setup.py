@@ -21,3 +21,5 @@ setup(
 # python38 -m build
 # python38 -m twine upload dist/*
 # NelsonSharma
+
+# python38 -m pip install -e ./
