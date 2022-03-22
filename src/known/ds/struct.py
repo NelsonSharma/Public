@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------------------------------
-# ds.py
+# struct.py
 #-----------------------------------------------------------------------------------------------------
-import os, json
+import os
 GLOBAL_CTRL_CHAR = {
 
     'SOH'   : 1,    # start of header
@@ -51,10 +51,6 @@ class iTOR:
     GLOBAL_US =     GLOBAL_CTRL_CHAR['US']
     GLOBAL_RS =     GLOBAL_CTRL_CHAR['RS']
     def create(path, index_ext='.index'):
-        """
-        creates a new STORAGE with root dir at 'root' where 'storage' is the name of storage configuration file
-        * prefered method of creating new storage from scratch
-        """
         return iTOR(path, os.path.join(os.path.dirname(path), os.path.basename(path) + index_ext) )
 
 
@@ -224,6 +220,14 @@ class iTOR:
             for i in range(l):
                 p('\t_{}_\t:\t[{}]'.format(i, self.count(i)))
 
+    def save(path, data):
+        itor = iTOR.create(path)
+        itor.open()
+        itor.write(*data)
+        itor.close()
+    def load(path):
+        itor = iTOR.create(path)
+        return list(itor.iterR())
 
 
 #------------------------------------
@@ -253,192 +257,6 @@ class MCM:
             ds.close()
         return True
 
-
-
-#------------------------------------
-# Storage 
-#------------------------------------
-class STORAGE:
-    DEFAULT_ROOT_STORE = '.' #<--- this store refers to the root dir as a store, the relative path is blank
-    """
-        Represents a collection of stores
-
-        [Members]
-        self.cwd        abs path of current working directory (of python)
-        self.storage    abs path of storage config (json) file
-        self.root       abs path of root dir which is the dir containing storage file
-                        Note: 'root_relative_paths' are relative to this root
-        self.stores     a dictionary of 'store_alias' v/s 'root_relative_paths' <-- contents of storage file
-
-    """
-    def create(root, storage, auto_load=True, auto_save=True):
-        """
-        creates a new STORAGE with root dir at 'root' where 'storage' is the name of storage configuration file
-        * prefered method of creating new storage from scratch
-        """
-        return STORAGE( os.path.join(root, storage), auto_create=True, auto_load=auto_load, auto_save=auto_save )
-
-    def __init__(self, storage, auto_create=True, auto_load=True, auto_save=True):
-        """
-        Create a storage configuration using a json file 'storage'
-        storage can be relative or absolute, only absolute paths are stored
-        storage ia the abs path for storage file
-        use STORAGE.create(root, storage) if 'storage' is just the name of storage file located inside root
-        """
-
-        self.cwd = os.getcwd() #<-- always returns a abs path
-        self.storage = os.path.abspath(storage) # stores abs paths in instances
-        self.root = os.path.dirname(self.storage) # abs dir name <-- root
-        self.autosave = auto_save
-
-        self.create_config() if auto_create else None #<-- create if not existing, it has no effect if storage exists
-        self.load_config() if auto_load else None # without calling load_config(), self.stores will not be created
-        
-    def load_config(self):
-        if os.path.exists(self.storage):
-            with open(self.storage, 'r') as f:
-                self.stores = json.loads(f.read())
-            return True
-        else:
-            return False
-
-    def save_config(self):
-        if os.path.exists(self.storage):
-            with open(self.storage, 'w') as f:
-                f.write(json.dumps(self.stores, sort_keys=False, indent=4))
-            return True
-        else:
-            return False
-
-    def create_config(self):
-        os.makedirs(self.root, exist_ok=True) 
-        if not os.path.exists(self.storage):
-            with open(self.storage, 'w') as f:
-                f.write(json.dumps({STORAGE.DEFAULT_ROOT_STORE:''}, sort_keys=False, indent=4))
-
-    def register(self, **stores):
-        """ register multiple stores using a dict of "alias":"root_relative_path """
-        for alias, root_rel_path in stores.items():
-            self.stores[alias] = root_rel_path
-            full_path =  os.path.join(self.root, root_rel_path)
-            os.makedirs( full_path, exist_ok=True )
-        return self.save_config() if self.autosave else None #<=== save json after adding
-
-
-    #------------------------------------
-    # path query 
-    #------------------------------------
-    def path_rel(self, alias, file):
-        return os.path.join(self.stores[alias], file) 
-
-    def path_abs(self, alias, file):
-        return os.path.join(os.path.join(self.root, self.stores[alias]), file)
-
-    def path_py(self, alias, file):
-        return os.path.relpath(os.path.join(os.path.join(self.root, self.stores[alias]), file), self.cwd)
-
-    def paths(self, alias, file): # path_ds replaced by call
-        """ returns 3-tuple (r,a,p) paths where
-            r = root realtive path
-            a = absolute path
-            p = python relative path
-        """
-        root_rel_path = self.stores[alias] #<--- ds path relative to root
-        file_root_rel_path = os.path.join(root_rel_path, file) #<--- file path relative to root
-
-        root_abs_path = os.path.join(self.root, root_rel_path) #<--- ds path abs
-        file_root_abs_path = os.path.join(root_abs_path, file) #<--- abs file path
-
-        py_rel_path = os.path.relpath(file_root_abs_path, self.cwd)
-
-        return file_root_rel_path, file_root_abs_path, py_rel_path # relp, absp, pyp
-
-    def __call__(self, alias, file):  #<--- returns python relative path
-        return self.path_py(alias, file)     
-
-
-    #------------------------------------
-    # file IO 
-    #------------------------------------
-    def save(self, alias, file, data, saveF):
-        """ save a file in this storage using saveF function like (lambda path, data: None) """
-        r,a,p = self.paths(alias, file)
-        saveF(p, data)
-        return r, a, p
-
-    def save_py(self, alias, file, data, saveF):
-        """ save a file in this storage using saveF function like (lambda path, data: None) """
-        p = self.path_py(alias, file)
-        saveF(p, data)
-        return p
-
-    def save_abs(self, alias, file, data, saveF):
-        """ save a file in this storage using saveF function like (lambda path, data: None) """
-        a = self.path_abs(alias, file)
-        saveF(a, data)
-        return a
-
-    def load(self, alias, file, loadF):
-        """ load a file from this storage using loadF function like (lambda path: data) """
-        r,a,p = self.paths(alias, file)
-        return loadF(p), r, a, p
-
-    def load_py(self, alias, file, loadF):
-        """ load a file from this storage using loadF function like (lambda path: data) """
-        p = self.path_py(alias, file)
-        return loadF(p), p
-
-    def load_abs(self, alias, file, loadF):
-        """ load a file from this storage using loadF function like (lambda path: data) """
-        a = self.path_abs(alias, file)
-        return loadF(a), a
-
-
-
-#------------------------------------
-# Forage
-#------------------------------------
-
-class FORAGE(STORAGE):
-
-    def create(root, storage, type_dict, auto_load=True, auto_save=True):
-        """
-        creates a new STORAGE with root dir at 'root' where 'storage' is the name of storage configuration file
-        * prefered method of creating new storage from scratch
-        """
-        return FORAGE( os.path.join(root, storage), type_dict, auto_create=True, auto_load=auto_load, auto_save=auto_save )
-        
-    def __init__(self, storage, type_dict, auto_create=True, auto_load=True, auto_save=True):
-        """ data_type_dict is a dictionary of   'dtype' : (saveF, loadF)    """
-        super().__init__(storage, auto_create, auto_load, auto_save)
-        self.type_dict = type_dict
-
-    def save(self, alias, file, data, dtpye):
-        r,a,p = self.paths(alias, file)
-        self.type_dict[dtpye][0](p, data)
-        return r, a, p
-
-    def save_py(self, alias, file, data, dtpye):
-        p = self.path_py(alias, file)
-        self.type_dict[dtpye][0](p, data)
-        return p
-
-    def save_abs(self, alias, file, data, dtpye):
-        a = self.path_abs(alias, file)
-        self.type_dict[dtpye][0](a, data)
-        return a
-
-    def load(self, alias, file, dtpye):
-        r,a,p = self.paths(alias, file)
-        return self.type_dict[dtpye][1](p), r, a, p
-
-    def load_py(self, alias, file, dtpye):
-        p = self.path_py(alias, file)
-        return self.type_dict[dtpye][1](p), p
-
-    def load_abs(self, alias, file, dtpye):
-        a = self.path_abs(alias, file)
-        return self.type_dict[dtpye][1](a), a
 
 
 

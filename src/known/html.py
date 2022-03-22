@@ -207,9 +207,8 @@ def code(htag, f, is_script=False):
             for c in htag.c:
                 code(c, f, (htag.t.lower()=='script'))
         if htag.o>0:
-            f.write('</' + htag.t + '>') # +nl
-            #f.write('\n')
-    
+            f.write('</' + htag.t + '>') # +nl #f.write('\n')
+
 def from_file(path, strip_data=False, enc='utf-8'):
     """ parse a single html file """
     return HARSER(strip_data).from_file(path, enc)
@@ -218,11 +217,10 @@ def from_web(path, strip_data, **args):
     """ parse a external html page """
     return HARSER(strip_data).from_web(path, **args)
 
-
-def to_file(hlist, path, enc='utf-8'):
+def to_file(hlist, path, is_script=False, enc='utf-8'):
     with open(path, 'wt', encoding=enc) as f:
         for h in hlist:
-            code(h, f=f)
+            code(h, f=f, is_script=is_script)
             f.write('\n')
 
 #-----------------------------------------------------------------------------------------------------
@@ -256,4 +254,7 @@ HELE_GLOBAL_ATR = {
 """
 #-----------------------------------------------------------------------------------------------------
 
-
+""" NOTE:
+    * Author:           Nelson.S
+"""
+#-----------------------------------------------------------------------------------------------------
