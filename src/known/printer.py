@@ -90,11 +90,11 @@ def now(format='%Y-%m-%d %H:%M:%S::%f'):
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 def strU(sep=''):
     """ formated time stamp based UID """
-    return datetime.datetime.strftime(datetime.datetime.now(), sep.join("%Y","%m","%d","%H","%M","%S","%f"))
+    return datetime.datetime.strftime(datetime.datetime.now(), sep.join(["%Y","%m","%d","%H","%M","%S","%f"]))
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 def strUx(start='', sep='', end=''):
     """ xtended formated time stamp based UID """
-    return start + datetime.datetime.strftime(datetime.datetime.now(), sep.join("%Y","%m","%d","%H","%M","%S","%f")) + end
+    return start + datetime.datetime.strftime(datetime.datetime.now(), sep.join(["%Y","%m","%d","%H","%M","%S","%f"])) + end
 
 
 #-----------------------------------------------------------------------------------------------------
