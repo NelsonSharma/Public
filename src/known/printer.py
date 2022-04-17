@@ -21,16 +21,11 @@ def strD(arr, sep="\n", cep="\t:\t", caption=""):
         res+=str(i) + cep + str(arr[i]) + sep
     return res + "=-=-=-=-==-=-=-=-="+sep
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def show(x, P = print):
+def show(x, sep="\n", cep='\t:\t', P = print):
     """ prints x.__dict__ using strD() """
-    P(strD(x.__dict__, cep='\t\t:', caption=str(x.__class__)))
+    P(strD(x.__dict__, sep=sep, cep=cep, caption=str(x.__class__)))
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def shows(*X, P = print):
-    """ prints x.__dict__ using strD() """
-    for x in X:
-        show(x, P)
-#=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def showx(x,  sw='__', ew='__', P = print):
+def showx(x, cep='\t\t:', sw='__', ew='__', P = print):
     """ Note: 'sw' can accept tuples """
     for d in dir(x):
         if not (d.startswith(sw) or d.endswith(ew)):
@@ -39,9 +34,9 @@ def showx(x,  sw='__', ew='__', P = print):
                 v = getattr(x, d)
             except:
                 v='?'
-            P(d, '\t\t:', v)
+            P(d, cep, v)
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def showz(x, P = print):
+def showX(x, cep='\t\t:',P = print):
     """ same as showx but shows all members, skip startswith test """
     for d in dir(x):
         v = ""
@@ -49,7 +44,41 @@ def showz(x, P = print):
             v = getattr(x, d)
         except:
             v='?'
-        P(d, '\t\t:', v)
+        P(d, cep, v)
+
+class SHOW:
+    def __init__(self, start='\n', sep='\n', cep='\t:\t', end='\n', sw='__', ew='__', P = print) -> None:
+        self.start, self.sep, self.cep, self.end = start, sep, cep, end
+        self.sw, self.ew = sw, ew
+        self.P = P
+    def __call__(self, x):
+        self.P(self.start)
+
+        if (self.sw or self.ew):# use all attr
+            for d in dir(x):
+                if not (d.startswith(self.sw) or d.endswith(self.ew)):
+                    v = ""
+                    try:
+                        v = getattr(x, d)
+                    except:
+                        v='?'
+                    self.P(d, self.cep, v)
+                    self.P(self.sep)
+
+        else:
+            for d in dir(x):
+                v = ""
+                try:
+                    v = getattr(x, d)
+                except:
+                    v='?'
+                self.P(d, self.cep, v)
+                self.P(self.sep)
+
+
+        self.P(self.end)
+
+
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
