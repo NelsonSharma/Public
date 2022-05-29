@@ -44,9 +44,4 @@ class FIG:
     load = lambda path: path
 
 
-class ITOR:
-    from known.ds.struct import iTOR
-    save = iTOR.save
-    load = iTOR.load
-
 
